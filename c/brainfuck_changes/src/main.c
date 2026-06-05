@@ -17,7 +17,8 @@
 
 #define TODO(MSG) \
     do { \
-        fprintf(stderr, "TODO: %s\ncrashed at %s:%d\n", MSG, __FILE__, __LINE__); \
+        fprintf(stderr,\
+            "TODO: %s\ncrashed at %s:%d\n", MSG, __FILE__, __LINE__); \
         abort(); \
     } while(0);
 
