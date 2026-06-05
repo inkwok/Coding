@@ -1,5 +1,7 @@
 //  TODO: handle flags, errors
 //
+//  completes e benchmark
+//
 //  handle flags:
 //      implement SETVBUF
 //      implement verbose output/debug output
