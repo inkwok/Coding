@@ -16,40 +16,43 @@ typedef enum symbol_type {
 } symbol_t;
 
 const uint8_t weights[] = { 40, 65, 80, 90, 97 };
-const char* emojis[] = { "🍉", "🍒", "🍋", "🔔", "💰", "💎" };
+const char* const emojis[] = { "🍉", "🍒", "🍋", "🔔", "💰", "💎" };
 
-int get_weights(uint8_t* probability_table) {
+int
+get_weights(uint8_t* probability_table) {
     uint64_t entropy;
     int i = 0;
     int window = 0;
 
     if(getrandom(&entropy, sizeof(entropy), 0) != sizeof(entropy)) return 1;
     while(i < LEN_SLOTS) {
-        uint8_t byte;
+        uint8_t slice;
 
-        if(window < 64) byte = (entropy >> window) & 0x7f;
+        if(window < 64) slice = (entropy >> window) & 0x7f;
         window += 7;
         if(window >= 64) {
             if(getrandom(&entropy, sizeof(entropy), 0) != sizeof(entropy))
                 return 1;
             window = 0;
         }
-        if(byte <= 99) probability_table[i++] = byte;
+        if(slice <= 99) probability_table[i++] = slice;
     }
     return 0;
 }
 
-symbol_t get_symbol(uint8_t val) {
-    if(val <= weights[0]) return SYM_0;
-    if(val <= weights[1]) return SYM_1;
-    if(val <= weights[2]) return SYM_2;
-    if(val <= weights[3]) return SYM_3;
-    if(val <= weights[4]) return SYM_4;
+symbol_t
+get_symbol(uint8_t v) {
+    if(v <= weights[0]) return SYM_0;
+    if(v <= weights[1]) return SYM_1;
+    if(v <= weights[2]) return SYM_2;
+    if(v <= weights[3]) return SYM_3;
+    if(v <= weights[4]) return SYM_4;
     return SYM_5;
 }
 
 void get_slot_id(uint8_t* weights, uint8_t* slots) {
-    for(int i = 0; i < LEN_SLOTS; i++) slots[i] = get_symbol(weights[i]);
+    for(int i = 0; i < LEN_SLOTS; i++)
+        slots[i] = get_symbol(weights[i]);
 }
 
 void print_symbols(uint8_t* slot_id) {
@@ -65,7 +68,10 @@ int init_money(unsigned int* money) {
     FILE* fp = fopen("money.txt", "r");
 
     if(fp == NULL) return -1;
-    if(fscanf(fp, "%u", money) != 1) return -1;
+    if(fscanf(fp, "%u", money) != 1) {
+        fclose(fp);
+        return -1;
+    }
     fclose(fp);
     return 0;
 }
@@ -147,26 +153,26 @@ table_data init_table(void) {
     return t;
 }
 
-void validate_rows(uint8_t* slot_id, table_data* t) {
+void validate_fives(uint8_t* slot_id, table_data* t) {
     //start with rows of 5
     for(int i = 0; i < 5; i++) {
         if(check_r5(slot_id, i)) t->row[i].contains_5 = 1;
+        if(check_c5(slot_id, i)) t->col[i].contains_5 = 1;
+    }
+}
+
+void validate_fours(uint8_t* slot_id, table_data* t) {
+    for(int i = 0; i < 5; i++) {
+        if(check_c4(slot_id, i, t)) t->col[i].contains_4 = 1;
         if(check_r4(slot_id, i, t)) t->row[i].contains_4 = 1;
     }
 }
 
-void validate_cols(uint8_t* slot_id, table_data* t) {
-    for(int i = 0; i < 5; i++) {
-        if(check_c5(slot_id, i)) t->col[i].contains_5 = 1;
-        if(check_c4(slot_id, i, t)) t->col[i].contains_4 = 1;
-        
-    }
-}
 //NEEDS A COLLISION PRUNER
 void validate_paylines(uint8_t* slot_id) {
     table_data t = init_table();
-    validate_rows(slot_id, &t);
-    validate_cols(slot_id, &t);
+    validate_fives(slot_id, &t);
+    validate_fours(slot_id, &t);
     printf("fives:\n");
     for(int i = 0; i < 5; i++) {
         printf("row %d: %d\tcol %d: %d\n", i, t.row[i].contains_5, i, t.col[i].contains_5);

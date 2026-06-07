@@ -1,7 +1,7 @@
 EXE_TARGET = ./target/bf
 ASM_TARGET = ./target/main.s
 FILES  = ./src/main.c
-EFLAGS  = -O0 -Wall -Wextra -Wpedantic -std=c99 -ggdb # -Werror
+EFLAGS  = -Wall -Wextra -Wpedantic -std=c99 -ggdb -Ofast -Werror
 SFLAGS = -S -masm=intel
 all: $(EXE_TARGET) #$(ASM_TARGET)
 

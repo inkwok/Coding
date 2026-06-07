@@ -1,6 +1,6 @@
 $(CC)  = gcc
 TARGET = ./target/slots
-FILES  = ./src/main.c
+FILES  = ./src/new.c
 FLAGS  = -O0 -Wall -Wextra -Wpedantic -std=c99 -ggdb# -Werror
 
 $(TARGET): $(FILES)

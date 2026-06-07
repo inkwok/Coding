@@ -30,6 +30,8 @@ typedef uint64_t DWORD;
 static const char* const FILE_DESCRIPTOR = ".bf";
 static const char* const DBG_TEXT = "\n\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
 static const char* const FDBG_TEXT = "\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
+static const char* const SYMBOL_TABLE[] = { "NULL", "IN", "OUT", "ADD", "SUB",
+    "LEFT", "RIGHT", "JZ", "JNZ" };
 
 enum {                 // cmdline flag options
     STATUS   = 1 << 0, // retval
@@ -187,7 +189,7 @@ ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t flags) {
     if(m && m->tape) {
         if(!(m->tape = realloc(m->tape, (m->size *= 2) * sizeof(WORD))))
             return EXIT_FAILURE;
-        for(DWORD i = m->p; i < m->size; i++) m->tape[i] = 0;
+        memset(m->tape + m->p, 0, (m->size - m->p) * sizeof(WORD));
         if(flags & DEBUG) printf(DBG_TEXT, m->size * sizeof(WORD) / 1024);
     }
 
@@ -196,9 +198,10 @@ ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t flags) {
 
 static int
 interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
+    int _x;
     switch(program.tape[*p].token) {
 
-        case TOK_IN:    (void)scanf("%u", &memory->tape[memory->p]); break;
+        case TOK_IN:    _x = scanf("%u", &memory->tape[memory->p]);      break;
         case TOK_OUT:   putchar((int)memory->tape[memory->p]);           break;
         case TOK_ADD:   memory->tape[memory->p]++;                       break;
         case TOK_SUB:   memory->tape[memory->p]--;                       break;
@@ -213,7 +216,7 @@ interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
         default:        return EXIT_FAILURE;
     }
     (*p)++;
-    
+
     if((memory->p == memory->size &&
         ensure_size(NULL, NULL, memory, f))) 
         return EXIT_FAILURE;
@@ -261,7 +264,7 @@ pop(mem_t* self) {
 }
 
 static inline int
-parse(prog_t* program, mem_t* stack, DWORD* p, const char c) {
+parse(prog_t* program, mem_t* stack, DWORD* p, const char c, uint8_t f) {
     switch(c) {
         case ',': append(program, p, TOK_IN);      break;
         case '.': append(program, p, TOK_OUT);     break;
@@ -308,7 +311,7 @@ cook(const char* filename, const uint8_t flags) {
 
     while(!(c == EOF || parse_bounds) && program.tape) {
         c = fgetc(fp);
-        if(parse(&program, &stack, &p, c) == EXIT_FAILURE) {
+        if(parse(&program, &stack, &p, c, flags) == EXIT_FAILURE) {
             program.cflags |= C_ERRPRS;
             break;
         }
