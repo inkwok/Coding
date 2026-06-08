@@ -20,22 +20,18 @@ typedef enum {
     SYM_5,
 } symbol_t;
 
-typedef struct {
-    int x;
-} paylines;
+typedef uint32_t payline_t;
 
 typedef struct {
-    uint8_t  weights[LEN_SLOTS];
-    uint8_t  ids[LEN_SLOTS];
-    uint32_t bitmaps[NUM_SYMBOLS];
+    uint8_t  weights[LEN_SLOTS]; // probabilities
+    uint8_t  ids[LEN_SLOTS]; // emoji index
+    uint32_t bitmaps[NUM_SYMBOLS]; // win detection uses this
     bool win;
 
-} board;
+} board_t;
 
 void
-print_bitmaps(board b) {
-    for(int i = 0; i < NUM_SYMBOLS; i++)
-        printf("[%s]: %x\n", emojis[i], b.bitmaps[i]);
+print_bitmaps(board_t b) {
     for(int j = 0; j < NUM_SYMBOLS; j++) {
         printf("[%s]:\n", emojis[j]);
         for(int i = 0; i < LEN_SLOTS; i++) {
@@ -56,9 +52,9 @@ print_symbols(uint8_t* slot_id) {
 }
 
 void
-get_bitmaps(board* b) {
+get_bitmaps(board_t* b) {
     memset(b->bitmaps, 0, sizeof(b->bitmaps));
-    for(uint8_t i = 0; i < NUM_SYMBOLS; i++) b->bitmaps[i] = 0;
+    // for(uint8_t i = 0; i < NUM_SYMBOLS; i++) b->bitmaps[i] = 0;
     for(uint8_t i = 0; i < LEN_SLOTS; i++)
         b->bitmaps[b->ids[i]] |= 1 << i;
 }
@@ -74,12 +70,12 @@ get_symbol(uint8_t v) {
 }
 
 void
-get_ids(board* b) {
+get_ids(board_t* b) {
     for(int i = 0; i < LEN_SLOTS; i++) b->ids[i] = get_symbol(b->weights[i]);
 }
 
 int
-get_weights(board* b) {
+get_weights(board_t* b) {
     uint64_t entropy;
     int i = 0;
     int window = 0;
@@ -101,22 +97,29 @@ get_weights(board* b) {
 }
 
 void
-generate_board() {
-    board b;
+init_money(uint64_t* money) {
 
-    while(get_weights(&b));
-    get_ids(&b);
-    print_symbols(b.ids);
-    get_bitmaps(&b);
-    print_bitmaps(b);
 }
 
-void
-init_money(unsigned int* money) {
+board_t
+generate_board() {
+    board_t b;
+    int retval = 1;
+    while(get_weights(&b));
+    get_ids(&b);
+    get_bitmaps(&b);
+    return b;
+}
 
+int
+eval_win(board_t b) {
+    // check for descending paylines and append to a list.
+    // resolve collisions by giving priority to higher-payouts.
+    return 0;
 }
 
 int
 main(void) {
-    generate_board();
+    board_t b = generate_board();
+    eval_win(b);
 }
