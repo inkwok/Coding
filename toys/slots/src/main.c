@@ -73,11 +73,11 @@ init_money(uint64_t* money) {
 }
 
 void
-sanitize_fours(board_t b, win_t* w) {
+sanitize_fours(board_t* b, win_t* w) {
     for(int i = 0; i < NUM_SYMBOLS; i++) {
         for(int row = 0; row < 5; row++) {
             uint32_t mask = R4A << (row * 5);
-            if(((b.bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
                 w->paylines[w->size].location = (row * 5);
                 w->paylines[w->size].type = FOUR_IN_A_ROW;
                 w->sanitized[i] |= mask;
@@ -86,7 +86,7 @@ sanitize_fours(board_t b, win_t* w) {
         }
         for(int row = 0; row < 5; row++) {
             uint32_t mask = R4B << (row * 5);
-            if(((b.bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
                 w->paylines[w->size].location = (row * 5) + 1;
                 w->paylines[w->size].type = FOUR_IN_A_ROW;
                 w->sanitized[i] |= mask;
@@ -96,7 +96,7 @@ sanitize_fours(board_t b, win_t* w) {
 
         for(int col = 0; col < 5; col++) {
             uint32_t mask = C4A << col;
-            if(((b.bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
                 w->paylines[w->size].location = col;
                 w->paylines[w->size].type = FOUR_IN_A_ROW;
                 w->sanitized[i] |= mask;
@@ -105,7 +105,7 @@ sanitize_fours(board_t b, win_t* w) {
         }
         for(int col = 0; col < 5; col++) {
             uint32_t mask = C4B << col;
-            if(((b.bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & w->sanitized[i])) {
                 w->paylines[w->size].location = col + 5;
                 w->paylines[w->size].type = FOUR_IN_A_ROW;
                 w->sanitized[i] |= mask;
@@ -137,14 +137,6 @@ sanitize_fives(board_t* b, win_t* w) {
             }
         }
     }
-    for(int i = 0; i < NUM_SYMBOLS; i++) {
-        printf("[%s]:\n", emojis[i]);
-        for(int j = 0; j < LEN_SLOTS; j++) {
-            putchar((w->sanitized[i] & (1u << j) ? 'X' : '.'));
-            if(j % 5 == 4) putchar('\n');
-        }
-    }
-
 }
 
 // 00 01 02 03 04
@@ -159,6 +151,8 @@ eval_win(board_t b) {
     win_t w = {0};
 
     sanitize_fives(&b, &w);
+    sanitize_fours(&b, &w);
+
     return w;
 }
 
@@ -167,6 +161,7 @@ main(void) {
     board_t b = generate_board();
     print_symbols(b);
     win_t w = eval_win(b);
+    print_bitmaps(w.sanitized);
 
-    print_bitmaps(b.bitmaps);
+    // print_bitmaps(b.bitmaps);
 }

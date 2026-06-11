@@ -231,21 +231,20 @@ interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
     return EXIT_SUCCESS;
 }
 
-
+#define IBOUND (p >= program.size || memory.p >= memory.size ||\
+                p >  MAX_WORD     || memory.p >  MAX_WORD)
 static int
 run(const prog_t program, const uint8_t flags) {
     mem_t memory = init_memory();
     DWORD p = 0;
-    bool interpret_bounds = (p >= program.size || memory.p >= memory.size ||
-                             p >  MAX_WORD     || memory.p >  MAX_WORD);
 
     if(!memory.tape) return EXIT_FAILURE;
     if(flags & DEBUG) printf(FDBG_TEXT, memory.size * sizeof(WORD) / 1024);
 
-    while(!(program.tape[p].token == TOK_NULL || interpret_bounds))
+    while(!(program.tape[p].token == TOK_NULL || IBOUND))
         if(interpret(program, &p, &memory, flags) == EXIT_FAILURE) break;
 
-    if(program.tape[p].token != TOK_NULL || interpret_bounds) {
+    if(program.tape[p].token != TOK_NULL || IBOUND) {
         if(memory.tape) free(memory.tape); //do error handling here
         return EXIT_FAILURE;
     }
@@ -300,6 +299,8 @@ parse(prog_t* program, mem_t* stack, DWORD* p, const char c, uint8_t f) {
     return EXIT_SUCCESS;
 }
 
+#define PBOUND (p >= program.size || stack.p >= stack.size ||\
+                p >  MAX_WORD     || stack.p >  MAX_WORD)
 
 static prog_t 
 cook(const char* filename, const uint8_t flags) {
@@ -309,14 +310,12 @@ cook(const char* filename, const uint8_t flags) {
     mem_t stack = init_stack();
     FILE* fp = open_and_check(filename);
 
-    bool parse_bounds = (p >= program.size || stack.p >= stack.size ||
-                         p >  MAX_WORD     || stack.p >  MAX_WORD);
     if(!program.tape || !stack.tape) { // may err here
         if(program.tape) free(program.tape);
         if(stack.tape) free(stack.tape);
     }
 
-    while(!(c == EOF || parse_bounds) && program.tape) {
+    while(!(c == EOF || PBOUND) && program.tape) {
         c = fgetc(fp);
         if(parse(&program, &stack, &p, c, flags) == EXIT_FAILURE) {
             program.cflags |= C_ERRPRS;
@@ -324,7 +323,7 @@ cook(const char* filename, const uint8_t flags) {
         }
     }
 
-    if(c != EOF || stack.p != 0 || parse_bounds) {
+    if(c != EOF || stack.p != 0 || PBOUND) {
         if(program.tape) free(program.tape);
         if(stack.tape) free(stack.tape);
         program.size = 0;
