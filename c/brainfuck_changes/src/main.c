@@ -30,8 +30,15 @@ typedef uint64_t DWORD;
 static const char* const FILE_DESCRIPTOR = ".bf";
 static const char* const DBG_TEXT = "\n\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
 static const char* const FDBG_TEXT = "\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
-static const char* const SYMBOL_TABLE[] = { "NULL", "IN", "OUT", "ADD", "SUB",
-    "LEFT", "RIGHT", "JZ", "JNZ" };
+/*
+static const char* const SYMBOL_TABLE[] = {
+    "NULL",
+    "IN",   "OUT",
+    "ADD",  "SUB",
+    "LEFT", "RIGHT",
+    "JZ",   "JNZ",
+};
+*/
 
 enum {                 // cmdline flag options
     STATUS   = 1 << 0, // retval
@@ -179,7 +186,7 @@ init_memory(void) {
 }
 
 static inline int
-ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t flags) {
+ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t f) {
     if(p && p->tape && !(p->tape = realloc(p->tape, (p->size *= 2) *
         sizeof(inst_t))))
         return EXIT_FAILURE;
@@ -190,7 +197,7 @@ ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t flags) {
         if(!(m->tape = realloc(m->tape, (m->size *= 2) * sizeof(WORD))))
             return EXIT_FAILURE;
         memset(m->tape + m->p, 0, (m->size - m->p) * sizeof(WORD));
-        if(flags & DEBUG) printf(DBG_TEXT, m->size * sizeof(WORD) / 1024);
+        if(f & DEBUG) printf(DBG_TEXT, m->size * sizeof(WORD) / 1024);
     }
 
     return EXIT_SUCCESS;
@@ -198,7 +205,7 @@ ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t flags) {
 
 static int
 interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
-    int _x;
+    int _x = 0;
     switch(program.tape[*p].token) {
 
         case TOK_IN:    _x = scanf("%u", &memory->tape[memory->p]);      break;
@@ -217,8 +224,8 @@ interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
     }
     (*p)++;
 
-    if((memory->p == memory->size &&
-        ensure_size(NULL, NULL, memory, f))) 
+    if(_x == EOF || (memory->p == memory->size &&
+        ensure_size(NULL, NULL, memory, f)))
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
@@ -286,9 +293,9 @@ parse(prog_t* program, mem_t* stack, DWORD* p, const char c, uint8_t f) {
     }
     (*p)++;
 
-    if(*p == program->size && ensure_size(program, NULL, NULL, 0))
+    if(*p == program->size && ensure_size(program, NULL, NULL, f))
         return EXIT_FAILURE;
-    if(stack->p == stack->size && ensure_size(NULL, stack, NULL, 0))
+    if(stack->p == stack->size && ensure_size(NULL, stack, NULL, f))
         return EXIT_FAILURE;
     return EXIT_SUCCESS;
 }
