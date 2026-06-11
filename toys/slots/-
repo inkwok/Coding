@@ -1,0 +1,79 @@
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <sys/random.h>
+#include <string.h>
+#include "gen.h"
+// #include "win.h"
+
+#define R5 0x0000001f
+#define C5 0x00108421
+
+const char* const emojis[] = { "🍉", "🍒", "🍋", "🔔", "💰", "💎" };
+
+void
+print_bitmaps(board_t b) {
+    for(int j = 0; j < NUM_SYMBOLS; j++) {
+        printf("[%s]:\n", emojis[j]);
+        for(int i = 0; i < LEN_SLOTS; i++) {
+            putchar((b.bitmaps[j] & (1u << i) ? 'X' : '.'));
+            if(i % 5 == 4) putchar('\n');
+        }
+    }
+}
+
+void
+print_symbols(board_t b) {
+    for(int i = 0; i < LEN_SLOTS; i+= 5) {
+        printf("%s %s %s %s %s\n",
+        emojis[b.ids[i + 0]], emojis[b.ids[i + 1]],
+        emojis[b.ids[i + 2]], emojis[b.ids[i + 3]],
+        emojis[b.ids[i + 4]]);
+    }
+}
+
+void
+init_money(uint64_t* money) {
+
+}
+
+void
+sanitize_fives(board_t* b) {
+    // uint32_t sanitized[NUM_SYMBOLS] = {0};
+
+    for(int i = 0; i < NUM_SYMBOLS; i++) {
+        for(int row = 0; row < 5; row++) {
+            uint32_t mask = R5 << (row * 5);
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & b->sanitized[i]))
+                    b->sanitized[i] |= mask;
+        }
+
+        for(int col = 0; col < 5; col++) {
+            uint32_t mask = C5 << col;
+            if(((b->bitmaps[i] & mask) == mask) && !(mask & b->sanitized[i]))
+                b->sanitized[i] |= mask;
+        }
+    }
+}
+
+// 00 01 02 03 04
+// 05 06 07 08 09
+// 10 11 12 13 14
+// 15 16 17 18 19
+// 20 21 22 23 24
+int
+eval_win(board_t* b) {
+    // check for descending paylines and append to a list.
+    // resolve collisions by giving priority to higher-payouts.
+    sanitize_fives(b);
+    return 0;
+}
+
+int
+main(void) {
+    board_t b = generate_board();
+    print_symbols(b);
+    print_bitmaps(b);
+    eval_win(&b);
+}
