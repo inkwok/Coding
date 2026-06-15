@@ -8,8 +8,8 @@
 #include <sys/random.h>
 #include <string.h>
 
-# define NUM_SYMBOLS 6
-# define LEN_SLOTS 25
+#define NUM_SYMBOLS 6
+#define LEN_SLOTS 25
 
 typedef enum {
     SYM_0,
@@ -26,8 +26,12 @@ typedef struct {
     uint32_t bitmaps[NUM_SYMBOLS]; // win detection uses this
 } board_t;
 
-symbol_t get_symbol(uint8_t v);
-int get_weights(board_t*);
+// symbol_t get_symbol(uint8_t v);
+// int get_weights(board_t*);
+
+/**
+ * Returns a struct of probabilities, symbols, and bitmaps.
+ */
 board_t generate_board(void);
 
 #endif // GEN_H

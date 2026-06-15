@@ -17,12 +17,12 @@
 
 #define MAX_WORD  UINT32_MAX
 
-#define TODO(MSG) \
-    do { \
-        fprintf(stderr,\
-            "TODO: %s\ncrashed at %s:%d\n", MSG, __FILE__, __LINE__); \
-        abort(); \
-    } while(0);
+#define TODO(MSG) {{                         \
+        fprintf(stderr,                      \
+            "TODO: %s\ncrashed at %s:%d\n",  \
+            MSG, __FILE__, __LINE__);        \
+        abort();                             \
+}}
 
 typedef uint32_t WORD;
 typedef uint64_t DWORD;
@@ -184,7 +184,7 @@ init_memory(void) {
 
     return m;
 }
-
+        
 static inline int
 ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t f) {
     if(p && p->tape && !(p->tape = realloc(p->tape, (p->size *= 2) *
@@ -203,7 +203,7 @@ ensure_size(prog_t* p, mem_t* s, mem_t* m, const uint8_t f) {
     return EXIT_SUCCESS;
 }
 
-static int
+static inline int
 interpret(const prog_t program, DWORD* p, mem_t* memory, const uint8_t f) {
     int _x = 0;
     switch(program.tape[*p].token) {

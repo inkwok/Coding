@@ -1,7 +1,8 @@
+CC = gcc
 EXE_TARGET = ./target/bf
 #ASM_TARGET = ./target/main.s
 FILES  = ./src/main.c
-EFLAGS  = -Wall -Wextra -Wpedantic -std=c99 -ggdb -Ofast -Werror
+EFLAGS  = -std=c99 -Wall -Wextra -Wpedantic -Werror -Ofast -ggdb
 #SFLAGS = -S -masm=intel
 all: $(EXE_TARGET) #$(ASM_TARGET)
 

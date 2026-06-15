@@ -14,15 +14,19 @@
 // 20 21 22 23 24
 
 #define R5  0x0000001fU
+
 #define R4A 0x0000000fU
 #define R4B 0x0000001eU
+
 #define R3A 0x00000007U
 #define R3B 0x0000000eU
 #define R3C 0x0000001cU
 
 #define C5  0x00108421U
+
 #define C4A 0x00008421U
 #define C4B 0x00108420U
+
 #define C3A 0x00000421U
 #define C3B 0x00008420U
 #define C3C 0x00108400U
