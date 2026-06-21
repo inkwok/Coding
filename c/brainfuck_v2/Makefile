@@ -1,13 +1,7 @@
-CC = gcc
-EXE_TARGET = ./target/bf
-#ASM_TARGET = ./target/main.s
+CC     = gcc
+TARGET = ./target/bf
 FILES  = ./src/main.c
-EFLAGS  = -std=c99 -Wall -Wextra -Wpedantic -Werror -Ofast -ggdb
-#SFLAGS = -S -masm=intel
-all: $(EXE_TARGET) #$(ASM_TARGET)
+FLAGS  = -std=c99 -Wall -Wextra -Wpedantic -Werror -Og -ggdb -march=native -flto
 
-$(EXE_TARGET): $(FILES)
-	$(CC) $(EFLAGS) -o $(EXE_TARGET) $(FILES)
-
-#$(ASM_TARGET): $(FILES)
-#	$(CC) $(SFLAGS) -o $(ASM_TARGET) $(FILES)
+$(TARGET): $(FILES)
+	$(CC) $(FLAGS) -o $(TARGET) $(FILES)
