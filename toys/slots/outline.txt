@@ -1,0 +1,31 @@
+
+
+
+
+
+
+
+
+
+gameloop() {
+    while(true) {
+        prompt_bet()
+        check_board()
+        calculate_win()
+        prompt_board()
+        save_money()
+        if(play_again() == no)
+            break
+        regenerate_board()
+    }
+}
+
+init() { #return a game object?
+    fetch_money()
+    seed_rng()
+}
+
+main() {
+    init() #money?
+    gameloop()
+}
