@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-args=("$@")
-prog=${args[0]}
-flag=${args[1]}
-./target/bf "bf_programs/$prog" "$flag"

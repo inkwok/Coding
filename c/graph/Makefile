@@ -1,12 +1,11 @@
 CC      ?= gcc
 
-TARGET  := target/bf
+TARGET  := target/graph
 SRC     := $(wildcard src/*.c)
 OBJ     := $(patsubst src/%.c,obj/%.o,$(SRC))
 
 PPFLAGS += -MMD -MP
-CFLAGS  += -std=c99 -Wall -Wextra -Wpedantic -Og -ggdb\
-		   -D_POSIX_C_SOURCE=200809L
+CFLAGS  += -std=c99 -Wall -Wextra -Wpedantic -Og -ggdb
 
 .PHONY: all clean run
 

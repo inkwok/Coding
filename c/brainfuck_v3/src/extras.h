@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <signal.h>
 
 #define TODO(MSG) {{                         \
         fprintf(stderr,                      \
