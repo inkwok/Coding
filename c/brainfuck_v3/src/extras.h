@@ -15,7 +15,6 @@
         abort();                             \
 }}
 
-/*
 static const char* const SYMBOL_TABLE[] = {
     "NULL",
     "IN",   "OUT",
@@ -23,9 +22,9 @@ static const char* const SYMBOL_TABLE[] = {
     "LEFT", "RIGHT",
     "JZ",   "JNZ",
 };
-*/
 
-enum {                 // cmdline flag options
+enum
+{                      // cmdline flag options
     STATUS   = 1 << 0, // retval
     DEBUG    = 1 << 1, // show memory information
     SHOWSYMB = 1 << 2, // show symbols
@@ -33,13 +32,15 @@ enum {                 // cmdline flag options
     ERRFLG   = 1 << 7, // error parsing cmdline flag chars
 };
 
-enum {
+enum
+{
     C_STATUS = 1 << 0, // retval
     C_ERRPRS = 1 << 1, // malloc() failed in ensure_size() in parse() in cook()
     C_ERRBND = 1 << 2, // bounds check failed after cook completion
 };
 
-enum {
+enum
+{
     R_STATUS = 1 << 0, //retval
     R_ERRPRS = 1 << 1, // malloc() failed in ensure_size()
     R_ERRBND = 1 << 2, // bounds check failed

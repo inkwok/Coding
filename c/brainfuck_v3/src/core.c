@@ -1,6 +1,5 @@
 #include "core.h"
 #include "extras.h"
-#include <stdlib.h>
 
 static const char* const     DBG_TEXT = "\n\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
 static const char* const     FDBG_TEXT = "\x1b[1;32mMemory size: %lu Kib\x1b[0m\n";
